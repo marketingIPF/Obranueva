@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="RK Obra Nueva" />
+<link rel="manifest" href="manifest.json" />
+<title>RK Palanca Fontestad — Obra Nueva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --naranja: #cf731b;
+    --naranja-dark: #b35f12;
+    --naranja-light: #f4e4d2;
+    --negro: #000000;
+    --gris-1: #f7f7f8;
+    --gris-2: #efeff1;
+    --gris-3: #d9d9dc;
+    --gris-4: #a1a1a8;
+    --gris-5: #6e6e76;
+    --texto: #1d1d1f;
+    --blanco: #ffffff;
+    --rojo: #d63b3b;
+    --verde: #2d7a4f;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
+    --shadow-xl: 0 24px 64px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.08);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 22px;
+    --radius-xl: 28px;
+    --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'Montserrat', -apple-system, sans-serif;
+    background: var(--gris-1);
+    color: var(--texto);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+  }
+
+  button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  input, select { font-family: inherit; }
+
+  /* ===== HEADER ===== */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .header-inner {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .header-logo { height: 44px; flex-shrink: 0; }
+  .header-logo svg { height: 100%; width: auto; display: block; }
+  .header-actions { display: flex; align-items: center; gap: 12px; }
+
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--texto);
+    transition: background var(--transition), transform var(--transition);
+    position: relative;
+  }
+  .icon-btn:hover { background: var(--gris-2); }
+  .icon-btn:active { transform: scale(0.95); }
+  .icon-btn svg { width: 22px; height: 22px; }
+
+  .icon-btn .badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: var(--naranja);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+  }
+  .icon-btn .badge:empty { display: none; }
+
+  .btn-primary {
+    background: var(--negro);
+    color: var(--blanco);
+    padding: 12px 22px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background var(--transition), transform var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary:hover { background: #1d1d1f; }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .btn-orange {
+    background: var(--naranja);
+    color: white;
+  }
+  .btn-orange:hover { background: var(--naranja-dark); }
+
+  .btn-ghost {
+    color: var(--gris-5);
+    padding: 10px 16px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background var(--transition), color var(--transition);
+  }
+  .btn-ghost:hover { background: var(--gris-2); color: var(--texto); }
+
+  /* ===== HERO ===== */
+  .hero {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 56px 32px 24px;
+  }
+  .hero-eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--naranja);
+    margin-bottom: 12px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .hero p {
+    font-size: 18px;
+    color: var(--gris-5);
+    max-width: 700px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  /* ===== STATS ===== */
+  .stats {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .stat {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 22px 26px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .stat-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gris-5);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .stat-value.accent { color: var(--naranja); }
+
+  /* ===== FILTROS ===== */
+  .filters {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 32px 32px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid var(--gris-3);
+    border-radius: 100px;
+    padding: 6px 6px 6px 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .filter-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gris-5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .filter-group select {
+    border: none;
+    background: var(--gris-1);
+    padding: 8px 14px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--texto);
+    cursor: pointer;
+    outline: none;
+  }
+  .filter-group select:focus { background: var(--gris-2); }
+
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border: 1px solid var(--gris-3);
+    border-radius: 100px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+  .toggle.active {
+    background: var(--negro);
+    color: white;
+    border-color: var(--negro);
+  }
+  .toggle-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gris-3);
+    transition: background var(--transition);
+  }
+  .toggle.active .toggle-dot { background: var(--naranja); }
+
+  .filter-spacer { flex: 1; }
+
+  /* ===== PROMOCIONES ===== */
+  .promociones {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 24px 32px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .promocion-section {
+    animation: fadeUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .promocion-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    background: white;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 28px;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .promocion-img {
+    height: 280px;
+    background: var(--gris-2) center/cover no-repeat;
+    position: relative;
+  }
+  .promocion-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, rgba(0,0,0,0.15), transparent 60%);
+  }
+  .promocion-info {
+    padding: 36px 36px 36px 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .promocion-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .estado-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .estado-precomercializacion { background: #fef3e2; color: #b35f12; }
+  .estado-con_licencia { background: #e8f1ff; color: #1e5fc8; }
+  .estado-en_obras { background: #fff1e0; color: var(--naranja); }
+  .estado-terminada { background: #e6f4ec; color: var(--verde); }
+  .estado-disponible { background: #e6f4ec; color: var(--verde); }
+  .estado-reservada { background: #fff5d6; color: #a07a00; }
+  .estado-vendida { background: #f0f0f3; color: var(--gris-5); }
+
+  .promocion-municipio {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gris-5);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .promocion-info h2 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 10px;
+  }
+  .promocion-ubicacion {
+    color: var(--gris-5);
+    font-size: 15px;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .promocion-descripcion {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #3d3d42;
+    margin-bottom: 20px;
+    font-weight: 400;
+  }
+  .promocion-meta {
+    display: flex;
+    gap: 24px;
+    font-size: 13px;
+    color: var(--gris-5);
+    border-top: 1px solid var(--gris-2);
+    padding-top: 16px;
+  }
+  .promocion-meta strong {
+    color: var(--texto);
+    font-weight: 700;
+    margin-left: 4px;
+  }
+
+  /* ===== GRID DE VIVIENDAS ===== */
+  .viviendas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .vivienda-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+  }
+  .vivienda-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(0,0,0,0.1);
+  }
+  .vivienda-card.no-disponible {
+    opacity: 0.55;
+    cursor: pointer;
+    background: var(--gris-1);
+  }
+  .vivienda-card.no-disponible:hover {
+    transform: none;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .vivienda-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .vivienda-numero {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .fav-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gris-1);
+    transition: all var(--transition);
+  }
+  .fav-btn:hover { background: var(--gris-2); transform: scale(1.08); }
+  .fav-btn:active { transform: scale(0.92); }
+  .fav-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--gris-5);
+    fill: none;
+    stroke-width: 2;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .fav-btn.active { background: var(--naranja-light); }
+  .fav-btn.active svg {
+    fill: var(--naranja);
+    stroke: var(--naranja);
+    transform: scale(1.05);
+  }
+
+  .vivienda-specs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 14px 0;
+    flex: 1;
+  }
+  .spec {
+    text-align: center;
+    padding: 10px 6px;
+    background: var(--gris-1);
+    border-radius: var(--radius-sm);
+  }
+  .spec-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--texto);
+    line-height: 1.2;
+  }
+  .spec-label {
+    font-size: 10px;
+    color: var(--gris-5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .vivienda-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 14px;
+    border-top: 1px solid var(--gris-2);
+  }
+  .vivienda-precio {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  /* Líneas de extras pequeños */
+  .vivienda-extras {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .extra-chip {
+    background: var(--gris-1);
+    color: var(--gris-5);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 100px 32px;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+  .empty-state-icon {
+    width: 88px;
+    height: 88px;
+    background: var(--naranja-light);
+    color: var(--naranja);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+  }
+  .empty-state-icon svg { width: 40px; height: 40px; }
+  .empty-state h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .empty-state p {
+    color: var(--gris-5);
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+  }
+  .modal-overlay.active { display: flex; }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .modal {
+    background: var(--gris-1);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    width: 100%;
+    max-width: 1100px;
+    max-height: 92vh;
+    overflow-y: auto;
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-overflow-scrolling: touch;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-header {
+    position: sticky;
+    top: 0;
+    background: rgba(247,247,248,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 18px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    z-index: 10;
+  }
+  .modal-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .modal-body { padding: 32px; }
+
+  .modal-gallery {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .modal-gallery img {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    background: var(--gris-2);
+  }
+  .modal-gallery-thumbs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .modal-gallery-thumbs img {
+    height: 100px;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: transform var(--transition);
+  }
+  .modal-gallery-thumbs img:hover { transform: scale(1.03); }
+
+  .modal-section {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .modal-section h3 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gris-5);
+    margin-bottom: 14px;
+  }
+
+  .specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+  }
+  .spec-block {
+    text-align: left;
+  }
+  .spec-block-label {
+    font-size: 12px;
+    color: var(--gris-5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .spec-block-value {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .spec-block-value.precio {
+    color: var(--naranja);
+  }
+
+  .planos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .plano-block {
+    background: var(--gris-1);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    text-align: center;
+  }
+  .plano-block img {
+    width: 100%;
+    height: 240px;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    background: white;
+  }
+  .plano-block-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gris-5);
+    font-weight: 700;
+    margin-top: 10px;
+  }
+
+  .modal-actions {
+    position: sticky;
+    bottom: 0;
+    background: rgba(247,247,248,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 16px 32px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  /* ===== PANEL FAVORITOS ===== */
+  .panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: none;
+    z-index: 999;
+    animation: fadeIn 0.3s ease;
+  }
+  .panel-overlay.active { display: block; }
+
+  .panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 460px;
+    background: white;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-xl);
+  }
+  .panel.active { transform: translateX(0); }
+
+  .panel-header {
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--gris-2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel-header h2 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 28px;
+  }
+  .panel-footer {
+    padding: 20px 28px;
+    border-top: 1px solid var(--gris-2);
+    background: white;
+  }
+
+  .fav-item {
+    background: var(--gris-1);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .fav-item-info { flex: 1; }
+  .fav-item-promo {
+    font-size: 11px;
+    color: var(--gris-5);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .fav-item-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .fav-item-meta {
+    font-size: 13px;
+    color: var(--gris-5);
+  }
+  .fav-item-precio {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--naranja);
+    margin-top: 6px;
+  }
+  .fav-remove {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--gris-2);
+    color: var(--gris-5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition);
+  }
+  .fav-remove:hover { background: var(--rojo); color: white; }
+  .fav-remove svg { width: 14px; height: 14px; }
+
+  .form-field {
+    margin-bottom: 14px;
+  }
+  .form-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gris-5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .form-field input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--gris-3);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    transition: border-color var(--transition);
+    outline: none;
+  }
+  .form-field input:focus {
+    border-color: var(--naranja);
+  }
+
+  .btn-block {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--negro);
+    color: white;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .btn-block:hover { background: var(--naranja); }
+  .btn-block:active { transform: scale(0.98); }
+  .btn-block:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--negro);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: var(--shadow-xl);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { background: var(--verde); }
+  .toast.error { background: var(--rojo); }
+
+  /* ===== ADMIN MODAL ===== */
+  .admin-modal { max-width: 600px; }
+  .admin-modal .modal-body {
+    padding: 32px;
+  }
+  .upload-zone {
+    border: 2px dashed var(--gris-3);
+    border-radius: var(--radius-lg);
+    padding: 48px 24px;
+    text-align: center;
+    transition: all var(--transition);
+    cursor: pointer;
+    background: var(--gris-1);
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--naranja);
+    background: var(--naranja-light);
+  }
+  .upload-zone:active {
+    transform: scale(0.99);
+  }
+  .upload-zone:focus-visible {
+    outline: none;
+    border-color: var(--naranja);
+    box-shadow: 0 0 0 4px rgba(207, 115, 27, 0.15);
+  }
+  .upload-zone svg {
+    width: 48px;
+    height: 48px;
+    color: var(--gris-4);
+    margin-bottom: 12px;
+  }
+  .upload-zone:hover svg, .upload-zone.dragover svg {
+    color: var(--naranja);
+  }
+  .upload-zone h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .upload-zone p {
+    color: var(--gris-5);
+    font-size: 14px;
+  }
+
+  .admin-info {
+    background: var(--gris-1);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--gris-5);
+    line-height: 1.6;
+  }
+  .admin-info strong { color: var(--texto); }
+
+  .admin-data-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: white;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gris-2);
+    font-size: 14px;
+  }
+  .admin-data-status.has-data {
+    background: #e6f4ec;
+    border-color: var(--verde);
+    color: var(--verde);
+  }
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gris-3);
+  }
+  .has-data .status-dot { background: var(--verde); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .header-inner { padding: 14px 18px; }
+    .hero { padding: 36px 18px 18px; }
+    .stats { grid-template-columns: repeat(2, 1fr); padding: 0 18px; gap: 10px; }
+    .filters { padding: 22px 18px 12px; }
+    .promociones { padding: 16px 18px 60px; gap: 36px; }
+    .promocion-header { grid-template-columns: 1fr; }
+    .promocion-img { height: 220px; }
+    .promocion-info { padding: 24px; }
+    .promocion-info h2 { font-size: 28px; }
+    .planos-grid { grid-template-columns: 1fr; }
+    .modal-body { padding: 20px; }
+    .modal-actions { padding: 14px 20px; }
+    .panel { max-width: 100%; }
+    .modal-gallery img { height: 240px; }
+    .filter-spacer { display: none; }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 30px; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .stat-value { font-size: 24px; }
+    .viviendas-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Scrollbar minimal */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--gris-3); border-radius: 100px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gris-4); }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-logo" id="header-logo">
+      <!-- Logo se inyecta vía JS -->
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="btn-admin" title="Administración">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <button class="btn-primary btn-orange" id="btn-favoritos">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        Favoritas <span id="fav-count">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-eyebrow">Obra Nueva · Valencia y área metropolitana</div>
+    <h1>Promociones disponibles</h1>
+    <p>Selecciona tus viviendas favoritas y nosotros te enviamos toda la información por correo.</p>
+  </section>
+
+  <section class="stats" id="stats">
+    <!-- Se rellena con JS -->
+  </section>
+
+  <section class="filters" id="filters" style="display:none;">
+    <div class="filter-group">
+      <label>Promoción</label>
+      <select id="filter-promo"><option value="">Todas</option></select>
+    </div>
+    <div class="filter-group">
+      <label>Habitaciones</label>
+      <select id="filter-hab">
+        <option value="">Todas</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4+</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Precio máx.</label>
+      <select id="filter-precio">
+        <option value="">Sin límite</option>
+        <option value="200000">200.000 €</option>
+        <option value="300000">300.000 €</option>
+        <option value="400000">400.000 €</option>
+        <option value="500000">500.000 €</option>
+        <option value="700000">700.000 €</option>
+      </select>
+    </div>
+    <div class="filter-spacer"></div>
+    <button class="toggle" id="toggle-no-disponibles">
+      <span class="toggle-dot"></span>
+      Mostrar vendidas/reservadas
+    </button>
+  </section>
+
+  <section class="promociones" id="promociones">
+    <!-- Se rellena con JS -->
+  </section>
+</main>
+
+<!-- Modal Detalle Vivienda -->
+<div class="modal-overlay" id="modal-detalle">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-titulo">Vivienda</h2>
+      <button class="icon-btn" onclick="cerrarModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="cerrarModal()">Cerrar</button>
+      <button class="btn-primary btn-orange" id="btn-fav-modal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <span id="fav-modal-text">Añadir a favoritas</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Panel Favoritos -->
+<div class="panel-overlay" id="panel-overlay" onclick="cerrarPanel()"></div>
+<aside class="panel" id="panel-favoritos">
+  <div class="panel-header">
+    <h2>Mis favoritas</h2>
+    <button class="icon-btn" onclick="cerrarPanel()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+  <div class="panel-footer" id="panel-footer">
+    <div class="form-field">
+      <label>Email del cliente</label>
+      <input type="email" id="cliente-email" placeholder="cliente@ejemplo.com" />
+    </div>
+    <div class="form-field">
+      <label>Nombre del cliente (opcional)</label>
+      <input type="text" id="cliente-nombre" placeholder="Nombre y apellidos" />
+    </div>
+    <button class="btn-block" id="btn-enviar-email" onclick="enviarEmail()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Enviar por email
+    </button>
+  </div>
+</aside>
+
+<!-- Modal Admin -->
+<div class="modal-overlay" id="modal-admin">
+  <div class="modal admin-modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Administración</h2>
+      <button class="icon-btn" onclick="cerrarAdmin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="upload-zone" id="upload-zone" role="button" tabindex="0">
+        <input type="file" id="file-input" accept=".xlsx,.xls" hidden />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <h3>Cargar plantilla Excel</h3>
+        <p>Haz clic o arrastra el archivo .xlsx con las promociones y viviendas</p>
+      </div>
+
+      <div class="admin-data-status" id="admin-data-status">
+        <span class="status-dot"></span>
+        <span id="admin-data-status-text">No hay datos cargados</span>
+      </div>
+
+      <div class="admin-info">
+        <strong>Cómo funciona:</strong><br />
+        El Excel debe tener dos hojas: <strong>Promociones</strong> y <strong>Viviendas</strong>. Los datos se guardan localmente en este dispositivo. La próxima vez que abras el dashboard, los datos seguirán cargados. Para actualizar, vuelve a cargar un Excel nuevo y se sobrescribirán.
+        <br /><br />
+        <strong>Configuración del email:</strong><br />
+        El email se enviará desde tu cliente de correo predeterminado (Mail, Outlook…). Asegúrate de tenerlo configurado en este equipo.
+      </div>
+
+      <div class="form-field" style="margin-top: 24px;">
+        <label>Email destino para CC interno (opcional)</label>
+        <input type="email" id="email-interno" placeholder="agente@rkpalanca.com" />
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:20px;">
+        <button class="btn-ghost" onclick="exportarFavoritos()" style="flex:1; background:var(--gris-1);">Exportar favoritos (JSON)</button>
+        <button class="btn-ghost" onclick="resetearDatos()" style="flex:1; background:#fee; color:var(--rojo);">Borrar todos los datos</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="toast-message"></span>
+</div>
+
+<script>
+  // ============ LOGO SVG (inyección directa con currentColor) ============
+  const LOGO_SVG = `<svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1034.69 206.5"><defs><style>.cls-1{fill:#1d1d1b;}.cls-2{fill:#cf731c;}</style></defs><path class="cls-1" d="M79.13,156.8h23.39L86,126.56l1-.62a26.24,26.24,0,0,0,12.94-23C100,85.87,87.44,74,69.49,74H33.75V156.8h21V130.69H65.29ZM54.76,92.35h12c7,0,11.61,4.12,11.61,10.49s-4.67,10.54-11.61,10.54h-12Z"/><polygon class="cls-1" points="172.16 156.8 143.14 114.05 143.34 113.75 169.65 73.96 145.4 73.96 123.53 108.82 123.53 73.96 102.52 73.96 102.52 156.8 123.53 156.8 123.53 120.19 147.3 156.8 172.16 156.8"/><path class="cls-2" d="M72.3,58.91a74.68,74.68,0,0,1,12.54-9.29c1.13-.63,2.22-1.35,3.39-1.91L91.72,46A75.7,75.7,0,0,1,99,43.15,69.65,69.65,0,0,1,114,39.76c20.45-2.41,41.64,4.09,56.74,17.55a73.07,73.07,0,0,1,17.9,24,71.22,71.22,0,0,1,6.62,28.83l.07,1.85c0,.62-.07,1.24-.1,1.85l-.24,3.7-.12,1.85-.25,1.83c-.14,1.22-.38,2.44-.61,3.64a67.19,67.19,0,0,1-4.28,14.06,69.9,69.9,0,0,1-14.8,22l6.62,9.75a80.91,80.91,0,0,0,17.63-28,78,78,0,0,0,4.14-16.22c.19-1.38.39-2.76.49-4.14l.19-2.08,0-2.09.08-4.17c0-.69,0-1.38,0-2.08l-.17-2.07a79.33,79.33,0,0,0-29.5-56.9,77.7,77.7,0,0,0-60.87-16A72.49,72.49,0,0,0,98.2,41.1c-2.5.91-4.88,2.11-7.28,3.25l-3.48,1.93c-1.17.63-2.25,1.41-3.37,2.11a74.68,74.68,0,0,0-12.27,10,80.85,80.85,0,0,0-9.91,12.25A80.72,80.72,0,0,1,72.3,58.91Z"/><path class="cls-2" d="M79.13,156.8h23.39L91.94,137.42q-10.22,2.43-20.17,5.49Z"/><path class="cls-2" d="M123.53,131.58q-10.61,1.42-21,3.51V156.8h21Z"/><path class="cls-2" d="M153.29,129q-11.56.48-22.9,1.75L147.3,156.8h24.86Z"/><path class="cls-2" d="M54.76,156.8v-8.13q-10.09,3.74-19.87,8.13Z"/><path class="cls-1" d="M242,74c12.37,0,19.45,6.11,19.45,16.88,0,11.32-7.08,17.85-19.45,17.85h-9.65v13.88h-11V74Zm-9.65,25.56h9.1c6.11,0,9.58-2.78,9.58-8.33s-3.47-8.13-9.58-8.13h-9.1Z"/><path class="cls-1" d="M274.63,113.13l-3.82,9.44H259.49L280.6,74h11.32l20.76,48.61H301l-3.82-9.44ZM286,85.42l-7.71,18.89h15.35Z"/><path class="cls-1" d="M349.56,113v9.58h-31.8V74h11v39Z"/><path class="cls-1" d="M366,113.13l-3.81,9.44H350.82L371.93,74h11.32L404,122.57H392.27l-3.82-9.44Zm11.32-27.71-7.7,18.89h15.34Z"/><path class="cls-1" d="M443.11,122.57,419.57,91.39v31.18H409.08V74h10l23.61,31.25V74h10.42v48.61Z"/><path class="cls-1" d="M505.41,81.67,499,89.45c-3.33-3.82-8.12-6.32-12.64-6.32a15,15,0,0,0,0,29.93c4.38,0,9.17-2.22,12.64-5.69l6.46,7c-5.14,5.28-12.57,8.68-19.65,8.68-14.52,0-25.49-10.76-25.49-24.86s11.18-24.58,25.9-24.58A27.65,27.65,0,0,1,505.41,81.67Z"/><path class="cls-1" d="M521.11,113.13l-3.82,9.44H506L527.08,74H538.4l20.76,48.61H547.43l-3.82-9.44Zm11.32-27.71-7.71,18.89h15.35Z"/><path class="cls-1" d="M592,83.06V95h21.94v9.16H592v18.4H581V74h34.94l-.07,9.1Z"/><path class="cls-1" d="M671.05,98.27c0,14-11.25,24.79-26.11,24.79s-26.11-10.69-26.11-24.79,11.25-24.65,26.11-24.65S671.05,84.17,671.05,98.27Zm-41,0a15.12,15.12,0,0,0,15,15.21,15.14,15.14,0,1,0-15-15.21Z"/><path class="cls-1" d="M712.3,122.57,688.76,91.39v31.18H678.28V74h10l23.61,31.25V74H722.3v48.61Z"/><path class="cls-1" d="M754,83.27v39.3H743V83.27H728.21V74h40.63v9.31Z"/><path class="cls-1" d="M785.72,83.06V93.62h23.47v9.09H785.72v10.77h26.8v9.09H774.74V74h37v9.1Z"/><path class="cls-1" d="M857.39,78.76l-4.24,9.09c-5.14-3-11.25-5-15.14-5-3.68,0-6.18,1.32-6.18,4,0,9,25.9,4,25.84,21.46,0,9.51-8.27,14.65-19,14.65a34.1,34.1,0,0,1-21.46-7.71l4.38-8.95c5,4.44,12.08,7.29,17.22,7.29,4.51,0,7.22-1.67,7.22-4.66,0-9.16-25.9-3.82-25.9-21,0-8.82,7.57-14.37,18.82-14.37A34.7,34.7,0,0,1,857.39,78.76Z"/><path class="cls-1" d="M886.35,83.27v39.3h-11V83.27H860.59V74h40.62v9.31Z"/><path class="cls-1" d="M911.63,113.13l-3.82,9.44H896.49L917.6,74h11.32l20.77,48.61H938l-3.82-9.44ZM923,85.42l-7.71,18.89h15.35Z"/><path class="cls-1" d="M975.39,74c15.07,0,25.55,9.93,25.55,24.31s-10.62,24.3-26,24.3H954.76V74Zm-9.66,39.38h9.94c8.12,0,14.09-6.11,14.09-15S983.51,83.2,975.18,83.2h-9.45Z"/></svg>`;
+
+  document.getElementById('header-logo').innerHTML = LOGO_SVG;
+
+  // ============ ESTADO ============
+  const ESTADO = {
+    promociones: [],
+    viviendas: [],
+    favoritos: new Set(),
+    mostrarNoDisponibles: false,
+    filtros: { promo: '', hab: '', precio: '' },
+    viviendaActual: null
+  };
+
+  // ============ INDEXEDDB ============
+  const DB_NAME = 'rkpalanca_obranueva';
+  const DB_VERSION = 1;
+  let db;
+
+  function abrirDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onerror = () => reject(req.error);
+      req.onsuccess = () => { db = req.result; resolve(db); };
+      req.onupgradeneeded = (e) => {
+        const _db = e.target.result;
+        if (!_db.objectStoreNames.contains('config')) {
+          _db.createObjectStore('config', { keyPath: 'key' });
+        }
+      };
+    });
+  }
+
+  function guardarConfig(key, value) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('config', 'readwrite');
+      const store = tx.objectStore('config');
+      const req = store.put({ key, value });
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function leerConfig(key) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('config', 'readonly');
+      const store = tx.objectStore('config');
+      const req = store.get(key);
+      req.onsuccess = () => resolve(req.result?.value);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  // ============ CARGA EXCEL ============
+  function parseExcel(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, { type: 'array' });
+
+          if (!wb.SheetNames.includes('Promociones') || !wb.SheetNames.includes('Viviendas')) {
+            return reject(new Error('El Excel debe tener las hojas "Promociones" y "Viviendas"'));
+          }
+
+          const promos = XLSX.utils.sheet_to_json(wb.Sheets['Promociones']);
+          const vivs = XLSX.utils.sheet_to_json(wb.Sheets['Viviendas']);
+
+          resolve({ promociones: promos, viviendas: vivs });
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  async function cargarExcel(file) {
+    try {
+      const { promociones, viviendas } = await parseExcel(file);
+
+      // Validación básica
+      if (!promociones.length) throw new Error('La hoja "Promociones" está vacía');
+      if (!viviendas.length) throw new Error('La hoja "Viviendas" está vacía');
+
+      ESTADO.promociones = promociones;
+      ESTADO.viviendas = viviendas.map(v => ({
+        ...v,
+        precio: Number(v.precio) || 0,
+        habitaciones: Number(v.habitaciones) || 0,
+        banos: Number(v.banos) || 0,
+        m2_construidos: Number(v.m2_construidos) || 0,
+        m2_utiles: Number(v.m2_utiles) || 0,
+        terraza_m2: Number(v.terraza_m2) || 0,
+        planta: Number(v.planta) || 0
+      }));
+
+      await guardarConfig('promociones', ESTADO.promociones);
+      await guardarConfig('viviendas', ESTADO.viviendas);
+
+      renderTodo();
+      cerrarAdmin();
+      mostrarToast(`✓ Cargadas ${promociones.length} promociones y ${viviendas.length} viviendas`, 'success');
+    } catch (err) {
+      mostrarToast('Error: ' + err.message, 'error');
+    }
+  }
+
+  // ============ RENDER ============
+  function formatPrecio(n) {
+    if (!n) return '—';
+    return new Intl.NumberFormat('es-ES').format(n) + ' €';
+  }
+
+  function getEstadoLabel(e) {
+    const map = {
+      precomercializacion: 'Precomercialización',
+      con_licencia: 'Con licencia',
+      en_obras: 'En obras',
+      terminada: 'Terminada',
+      disponible: 'Disponible',
+      reservada: 'Reservada',
+      vendida: 'Vendida'
+    };
+    return map[e] || e;
+  }
+
+  function renderStats() {
+    const total = ESTADO.viviendas.length;
+    const disp = ESTADO.viviendas.filter(v => v.estado === 'disponible').length;
+    const reservadas = ESTADO.viviendas.filter(v => v.estado === 'reservada').length;
+    const promos = ESTADO.promociones.length;
+
+    document.getElementById('stats').innerHTML = `
+      <div class="stat">
+        <div class="stat-label">Promociones activas</div>
+        <div class="stat-value">${promos}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Viviendas totales</div>
+        <div class="stat-value">${total}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Disponibles</div>
+        <div class="stat-value accent">${disp}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Reservadas</div>
+        <div class="stat-value">${reservadas}</div>
+      </div>
+    `;
+  }
+
+  function renderFiltros() {
+    if (!ESTADO.promociones.length) {
+      document.getElementById('filters').style.display = 'none';
+      return;
+    }
+    document.getElementById('filters').style.display = 'flex';
+
+    const sel = document.getElementById('filter-promo');
+    sel.innerHTML = '<option value="">Todas</option>' +
+      ESTADO.promociones.map(p => `<option value="${p.id_promocion}">${p.nombre}</option>`).join('');
+  }
+
+  function viviendaPasaFiltros(v) {
+    if (ESTADO.filtros.promo && v.id_promocion !== ESTADO.filtros.promo) return false;
+    if (ESTADO.filtros.hab) {
+      const h = parseInt(ESTADO.filtros.hab);
+      if (h === 4 && v.habitaciones < 4) return false;
+      if (h !== 4 && v.habitaciones !== h) return false;
+    }
+    if (ESTADO.filtros.precio && v.precio > parseInt(ESTADO.filtros.precio)) return false;
+    if (!ESTADO.mostrarNoDisponibles && v.estado !== 'disponible' && v.estado !== 'precomercializacion') return false;
+    return true;
+  }
+
+  function renderPromociones() {
+    const cont = document.getElementById('promociones');
+
+    if (!ESTADO.promociones.length) {
+      cont.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <h2>Aún no hay datos cargados</h2>
+          <p>Para empezar, carga el Excel con las promociones y viviendas desde el panel de administración.</p>
+          <button class="btn-primary btn-orange" onclick="abrirAdmin()">
+            Abrir administración
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    ESTADO.promociones.forEach((promo, idx) => {
+      const viviendasPromo = ESTADO.viviendas
+        .filter(v => v.id_promocion === promo.id_promocion)
+        .filter(viviendaPasaFiltros);
+
+      if (!viviendasPromo.length) return;
+
+      const dispCount = ESTADO.viviendas.filter(v => v.id_promocion === promo.id_promocion && v.estado === 'disponible').length;
+      const totalCount = ESTADO.viviendas.filter(v => v.id_promocion === promo.id_promocion).length;
+
+      const imgUrl = promo.imagen_principal_url || 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200';
+
+      html += `
+        <div class="promocion-section" style="animation-delay: ${idx * 0.08}s">
+          <div class="promocion-header">
+            <div class="promocion-img" style="background-image: url('${imgUrl}')"></div>
+            <div class="promocion-info">
+              <div class="promocion-eyebrow">
+                <span class="estado-badge estado-${promo.estado}">${getEstadoLabel(promo.estado)}</span>
+                <span class="promocion-municipio">${promo.municipio || ''}</span>
+              </div>
+              <h2>${promo.nombre}</h2>
+              <div class="promocion-ubicacion">${promo.ubicacion || ''}</div>
+              <div class="promocion-descripcion">${promo.descripcion || ''}</div>
+              <div class="promocion-meta">
+                <span>Disponibles<strong>${dispCount} / ${totalCount}</strong></span>
+                <span>Entrega<strong>${promo.fecha_entrega_prevista || '—'}</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="viviendas-grid">
+            ${viviendasPromo.map(renderViviendaCard).join('')}
+          </div>
+        </div>
+      `;
+    });
+
+    cont.innerHTML = html || `
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h2>No hay viviendas con estos filtros</h2>
+        <p>Prueba a ajustar los filtros o activa la opción "Mostrar vendidas/reservadas".</p>
+      </div>
+    `;
+  }
+
+  function renderViviendaCard(v) {
+    const noDisp = v.estado !== 'disponible' && v.estado !== 'precomercializacion';
+    const isFav = ESTADO.favoritos.has(v.id_vivienda);
+
+    return `
+      <div class="vivienda-card ${noDisp ? 'no-disponible' : ''}" onclick="abrirDetalle('${v.id_vivienda}')">
+        <div class="vivienda-top">
+          <div>
+            <div class="vivienda-numero">${v.numero}</div>
+            <span class="estado-badge estado-${v.estado}" style="margin-top:4px; display:inline-block;">${getEstadoLabel(v.estado)}</span>
+          </div>
+          ${!noDisp ? `
+            <button class="fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorito('${v.id_vivienda}')">
+              <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </button>
+          ` : ''}
+        </div>
+        <div class="vivienda-specs">
+          <div class="spec">
+            <div class="spec-value">${v.habitaciones}</div>
+            <div class="spec-label">Hab.</div>
+          </div>
+          <div class="spec">
+            <div class="spec-value">${v.banos}</div>
+            <div class="spec-label">Baños</div>
+          </div>
+          <div class="spec">
+            <div class="spec-value">${v.m2_construidos}</div>
+            <div class="spec-label">m² const.</div>
+          </div>
+        </div>
+        <div class="vivienda-extras">
+          ${v.terraza_m2 > 0 ? `<span class="extra-chip">Terraza ${v.terraza_m2}m²</span>` : ''}
+          ${v.balcon === 'Si' ? `<span class="extra-chip">Balcón</span>` : ''}
+          ${v.garaje === 'Si' ? `<span class="extra-chip">Garaje</span>` : ''}
+          ${v.trastero === 'Si' ? `<span class="extra-chip">Trastero</span>` : ''}
+          ${v.orientacion ? `<span class="extra-chip">${v.orientacion}</span>` : ''}
+        </div>
+        <div class="vivienda-bottom">
+          <div class="vivienda-precio">${formatPrecio(v.precio)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ============ DETALLE ============
+  function abrirDetalle(idVivienda) {
+    const v = ESTADO.viviendas.find(x => x.id_vivienda === idVivienda);
+    if (!v) return;
+
+    ESTADO.viviendaActual = v;
+    const promo = ESTADO.promociones.find(p => p.id_promocion === v.id_promocion);
+
+    document.getElementById('modal-titulo').textContent = `${promo?.nombre || ''} · ${v.numero}`;
+
+    const fotos = (v.fotos_urls || '').split(',').map(s => s.trim()).filter(Boolean);
+    const fotoPrincipal = fotos[0] || promo?.imagen_principal_url || '';
+
+    let galeriaHtml = '';
+    if (fotoPrincipal) {
+      galeriaHtml = `
+        <div class="modal-gallery">
+          <img id="foto-principal" src="${fotoPrincipal}" alt="Foto principal" />
+          ${fotos.length > 1 ? `
+            <div class="modal-gallery-thumbs">
+              ${fotos.map(f => `<img src="${f}" onclick="document.getElementById('foto-principal').src='${f}'" />`).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    let planosHtml = '';
+    if (v.plano_2d_url || v.plano_3d_url) {
+      planosHtml = `
+        <div class="modal-section">
+          <h3>Planos</h3>
+          <div class="planos-grid">
+            ${v.plano_2d_url ? `
+              <div class="plano-block">
+                <img src="${v.plano_2d_url}" alt="Plano 2D" onerror="this.parentElement.style.display='none'" />
+                <div class="plano-block-label">Plano 2D</div>
+              </div>
+            ` : ''}
+            ${v.plano_3d_url ? `
+              <div class="plano-block">
+                <img src="${v.plano_3d_url}" alt="Plano 3D" onerror="this.parentElement.style.display='none'" />
+                <div class="plano-block-label">Plano 3D</div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById('modal-body').innerHTML = `
+      ${galeriaHtml}
+
+      <div class="modal-section">
+        <h3>Estado de la promoción</h3>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <span class="estado-badge estado-${promo?.estado}" style="font-size:13px; padding:8px 16px;">${getEstadoLabel(promo?.estado)}</span>
+          ${promo?.fecha_entrega_prevista ? `<span style="color:var(--gris-5); font-size:14px;">Entrega prevista: <strong style="color:var(--texto)">${promo.fecha_entrega_prevista}</strong></span>` : ''}
+        </div>
+        ${promo?.descripcion ? `<p style="margin-top:14px; color:#3d3d42; line-height:1.6; font-size:14px;">${promo.descripcion}</p>` : ''}
+      </div>
+
+      <div class="modal-section">
+        <h3>Características principales</h3>
+        <div class="specs-grid">
+          <div class="spec-block">
+            <div class="spec-block-label">Precio</div>
+            <div class="spec-block-value precio">${formatPrecio(v.precio)}</div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-label">Habitaciones</div>
+            <div class="spec-block-value">${v.habitaciones}</div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-label">Baños</div>
+            <div class="spec-block-value">${v.banos}</div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-label">m² construidos</div>
+            <div class="spec-block-value">${v.m2_construidos}</div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-label">m² útiles</div>
+            <div class="spec-block-value">${v.m2_utiles || '—'}</div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-label">Planta</div>
+            <div class="spec-block-value">${v.planta === 0 ? 'Bajo' : v.planta}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Detalles adicionales</h3>
+        <div class="specs-grid">
+          <div class="spec-block">
+            <div class="spec-block-label">Terraza</div>
+            <div class="spec-block-value">${v.terraza_m2 > 0 ? v.terraza_m2 + ' m²' : '—'}</div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-label">Balcón</div>
+            <div class="spec-block-value">${v.balcon || '—'}</div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-label">Orientación</div>
+            <div class="spec-block-value">${v.orientacion || '—'}</div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-label">Garaje</div>
+            <div class="spec-block-value">${v.garaje || '—'}</div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-label">Trastero</div>
+            <div class="spec-block-value">${v.trastero || '—'}</div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-label">Cert. energética</div>
+            <div class="spec-block-value">${v.certificacion_energetica || '—'}</div>
+          </div>
+        </div>
+      </div>
+
+      ${planosHtml}
+
+      <div class="modal-section">
+        <h3>Ubicación</h3>
+        <div style="font-size:15px; color:#3d3d42; line-height:1.5;">
+          <strong>${promo?.ubicacion || ''}</strong><br>
+          ${promo?.municipio || ''}
+        </div>
+      </div>
+    `;
+
+    actualizarBotonFavModal();
+
+    const noDisp = v.estado !== 'disponible' && v.estado !== 'precomercializacion';
+    document.getElementById('btn-fav-modal').style.display = noDisp ? 'none' : 'inline-flex';
+
+    document.getElementById('modal-detalle').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarModal() {
+    document.getElementById('modal-detalle').classList.remove('active');
+    document.body.style.overflow = '';
+    ESTADO.viviendaActual = null;
+  }
+
+  function actualizarBotonFavModal() {
+    if (!ESTADO.viviendaActual) return;
+    const isFav = ESTADO.favoritos.has(ESTADO.viviendaActual.id_vivienda);
+    const btn = document.getElementById('btn-fav-modal');
+    const txt = document.getElementById('fav-modal-text');
+    if (isFav) {
+      btn.classList.add('active');
+      txt.textContent = 'Quitar de favoritas';
+    } else {
+      btn.classList.remove('active');
+      txt.textContent = 'Añadir a favoritas';
+    }
+  }
+
+  document.getElementById('btn-fav-modal').addEventListener('click', () => {
+    if (ESTADO.viviendaActual) {
+      toggleFavorito(ESTADO.viviendaActual.id_vivienda);
+      actualizarBotonFavModal();
+    }
+  });
+
+  // ============ FAVORITOS ============
+  function toggleFavorito(idVivienda) {
+    if (ESTADO.favoritos.has(idVivienda)) {
+      ESTADO.favoritos.delete(idVivienda);
+    } else {
+      ESTADO.favoritos.add(idVivienda);
+    }
+    guardarConfig('favoritos', [...ESTADO.favoritos]);
+    actualizarFavCount();
+    renderPromociones();
+  }
+
+  function actualizarFavCount() {
+    document.getElementById('fav-count').textContent = ESTADO.favoritos.size;
+  }
+
+  function abrirPanel() {
+    renderPanelFavoritos();
+    document.getElementById('panel-favoritos').classList.add('active');
+    document.getElementById('panel-overlay').classList.add('active');
+  }
+
+  function cerrarPanel() {
+    document.getElementById('panel-favoritos').classList.remove('active');
+    document.getElementById('panel-overlay').classList.remove('active');
+  }
+
+  function renderPanelFavoritos() {
+    const cont = document.getElementById('panel-body');
+    if (!ESTADO.favoritos.size) {
+      cont.innerHTML = `
+        <div style="text-align:center; padding:60px 20px; color:var(--gris-5);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:64px; height:64px; opacity:0.3; margin-bottom:16px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <p style="font-size:15px;">Aún no has añadido ninguna vivienda a favoritas.</p>
+          <p style="font-size:13px; margin-top:8px;">Toca el corazón en cualquier vivienda para guardarla aquí.</p>
+        </div>
+      `;
+      document.getElementById('btn-enviar-email').disabled = true;
+      return;
+    }
+
+    document.getElementById('btn-enviar-email').disabled = false;
+
+    let html = '';
+    [...ESTADO.favoritos].forEach(id => {
+      const v = ESTADO.viviendas.find(x => x.id_vivienda === id);
+      if (!v) return;
+      const promo = ESTADO.promociones.find(p => p.id_promocion === v.id_promocion);
+      html += `
+        <div class="fav-item">
+          <div class="fav-item-info">
+            <div class="fav-item-promo">${promo?.nombre || ''}</div>
+            <div class="fav-item-name">${v.numero}</div>
+            <div class="fav-item-meta">${v.habitaciones} hab · ${v.banos} baños · ${v.m2_construidos} m²</div>
+            <div class="fav-item-precio">${formatPrecio(v.precio)}</div>
+          </div>
+          <button class="fav-remove" onclick="quitarFav('${id}')" title="Quitar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      `;
+    });
+    cont.innerHTML = html;
+  }
+
+  function quitarFav(id) {
+    ESTADO.favoritos.delete(id);
+    guardarConfig('favoritos', [...ESTADO.favoritos]);
+    actualizarFavCount();
+    renderPromociones();
+    renderPanelFavoritos();
+    if (ESTADO.viviendaActual?.id_vivienda === id) actualizarBotonFavModal();
+  }
+
+  // ============ EMAIL ============
+  async function enviarEmail() {
+    const email = document.getElementById('cliente-email').value.trim();
+    const nombre = document.getElementById('cliente-nombre').value.trim();
+    const emailInterno = await leerConfig('email_interno') || '';
+
+    if (!email) {
+      mostrarToast('Indica un email válido', 'error');
+      return;
+    }
+    if (!ESTADO.favoritos.size) {
+      mostrarToast('No hay favoritos seleccionados', 'error');
+      return;
+    }
+
+    let cuerpo = `Hola${nombre ? ' ' + nombre : ''},\n\n`;
+    cuerpo += `Gracias por tu visita a RK Palanca Fontestad. Te enviamos la información de las viviendas que has seleccionado como favoritas:\n\n`;
+    cuerpo += `${'─'.repeat(50)}\n\n`;
+
+    let idx = 1;
+    [...ESTADO.favoritos].forEach(id => {
+      const v = ESTADO.viviendas.find(x => x.id_vivienda === id);
+      if (!v) return;
+      const promo = ESTADO.promociones.find(p => p.id_promocion === v.id_promocion);
+
+      cuerpo += `${idx}. ${promo?.nombre || ''} — Vivienda ${v.numero}\n`;
+      cuerpo += `   ${promo?.ubicacion || ''}, ${promo?.municipio || ''}\n`;
+      cuerpo += `   Estado promoción: ${getEstadoLabel(promo?.estado)}\n`;
+      cuerpo += `   Entrega prevista: ${promo?.fecha_entrega_prevista || '—'}\n\n`;
+      cuerpo += `   • ${v.habitaciones} habitaciones, ${v.banos} baños\n`;
+      cuerpo += `   • ${v.m2_construidos} m² construidos${v.m2_utiles ? ` (${v.m2_utiles} m² útiles)` : ''}\n`;
+      if (v.terraza_m2 > 0) cuerpo += `   • Terraza de ${v.terraza_m2} m²\n`;
+      if (v.balcon === 'Si') cuerpo += `   • Balcón\n`;
+      if (v.orientacion) cuerpo += `   • Orientación ${v.orientacion}\n`;
+      if (v.planta !== undefined) cuerpo += `   • Planta ${v.planta === 0 ? 'baja' : v.planta}\n`;
+      if (v.garaje === 'Si') cuerpo += `   • Plaza de garaje incluida\n`;
+      if (v.trastero === 'Si') cuerpo += `   • Trastero incluido\n`;
+      if (v.certificacion_energetica) cuerpo += `   • Certificación energética: ${v.certificacion_energetica}\n`;
+      cuerpo += `\n   PRECIO: ${formatPrecio(v.precio)}\n\n`;
+      cuerpo += `${'─'.repeat(50)}\n\n`;
+      idx++;
+    });
+
+    cuerpo += `Si quieres concertar una visita o resolver cualquier duda sobre estas viviendas, responde a este correo o contacta con nosotros directamente.\n\n`;
+    cuerpo += `Un saludo,\nRK Palanca Fontestad\nValencia y área metropolitana\n`;
+
+    const asunto = `Tus viviendas favoritas — RK Palanca Fontestad`;
+    let mailto = `mailto:${encodeURIComponent(email)}`;
+    const params = [`subject=${encodeURIComponent(asunto)}`, `body=${encodeURIComponent(cuerpo)}`];
+    if (emailInterno) params.unshift(`cc=${encodeURIComponent(emailInterno)}`);
+    mailto += '?' + params.join('&');
+
+    window.location.href = mailto;
+    mostrarToast('Abriendo cliente de correo…', 'success');
+  }
+
+  // ============ ADMIN ============
+  function abrirAdmin() {
+    actualizarStatusAdmin();
+    leerConfig('email_interno').then(v => {
+      document.getElementById('email-interno').value = v || '';
+    });
+    document.getElementById('modal-admin').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarAdmin() {
+    document.getElementById('modal-admin').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function actualizarStatusAdmin() {
+    const status = document.getElementById('admin-data-status');
+    const text = document.getElementById('admin-data-status-text');
+    if (ESTADO.promociones.length) {
+      status.classList.add('has-data');
+      text.textContent = `${ESTADO.promociones.length} promociones · ${ESTADO.viviendas.length} viviendas cargadas`;
+    } else {
+      status.classList.remove('has-data');
+      text.textContent = 'No hay datos cargados';
+    }
+  }
+
+  async function resetearDatos() {
+    if (!confirm('¿Borrar todos los datos cargados? Esta acción no se puede deshacer.')) return;
+    await guardarConfig('promociones', []);
+    await guardarConfig('viviendas', []);
+    await guardarConfig('favoritos', []);
+    ESTADO.promociones = [];
+    ESTADO.viviendas = [];
+    ESTADO.favoritos.clear();
+    renderTodo();
+    cerrarAdmin();
+    mostrarToast('Datos borrados', 'success');
+  }
+
+  function exportarFavoritos() {
+    if (!ESTADO.favoritos.size) {
+      mostrarToast('No hay favoritos que exportar', 'error');
+      return;
+    }
+    const data = [...ESTADO.favoritos].map(id => {
+      const v = ESTADO.viviendas.find(x => x.id_vivienda === id);
+      const p = ESTADO.promociones.find(pr => pr.id_promocion === v.id_promocion);
+      return { promocion: p?.nombre, ...v };
+    });
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `favoritos_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ============ TOAST ============
+  let toastTimer;
+  function mostrarToast(msg, tipo = '') {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-message').textContent = msg;
+    t.className = 'toast show ' + tipo;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  // ============ RENDER GLOBAL ============
+  function renderTodo() {
+    renderStats();
+    renderFiltros();
+    renderPromociones();
+    actualizarFavCount();
+  }
+
+  // ============ EVENTOS ============
+  document.getElementById('btn-favoritos').addEventListener('click', abrirPanel);
+  document.getElementById('btn-admin').addEventListener('click', abrirAdmin);
+
+  document.getElementById('toggle-no-disponibles').addEventListener('click', (e) => {
+    ESTADO.mostrarNoDisponibles = !ESTADO.mostrarNoDisponibles;
+    e.currentTarget.classList.toggle('active', ESTADO.mostrarNoDisponibles);
+    renderPromociones();
+  });
+
+  document.getElementById('filter-promo').addEventListener('change', e => {
+    ESTADO.filtros.promo = e.target.value;
+    renderPromociones();
+  });
+  document.getElementById('filter-hab').addEventListener('change', e => {
+    ESTADO.filtros.hab = e.target.value;
+    renderPromociones();
+  });
+  document.getElementById('filter-precio').addEventListener('change', e => {
+    ESTADO.filtros.precio = e.target.value;
+    renderPromociones();
+  });
+
+  // Drag & drop + click
+  const uploadZone = document.getElementById('upload-zone');
+  const fileInput = document.getElementById('file-input');
+
+  uploadZone.addEventListener('click', () => fileInput.click());
+  uploadZone.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      fileInput.click();
+    }
+  });
+  fileInput.addEventListener('change', e => {
+    if (e.target.files && e.target.files[0]) {
+      cargarExcel(e.target.files[0]);
+      e.target.value = ''; // reset para permitir recargar el mismo archivo
+    }
+  });
+  uploadZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    uploadZone.classList.add('dragover');
+  });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) cargarExcel(e.dataTransfer.files[0]);
+  });
+
+  // Email interno
+  document.getElementById('email-interno').addEventListener('blur', e => {
+    guardarConfig('email_interno', e.target.value.trim());
+  });
+
+  // Cerrar modales con Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      cerrarModal();
+      cerrarPanel();
+      cerrarAdmin();
+    }
+  });
+
+  // Click fuera de modal para cerrar
+  document.getElementById('modal-detalle').addEventListener('click', e => {
+    if (e.target.id === 'modal-detalle') cerrarModal();
+  });
+  document.getElementById('modal-admin').addEventListener('click', e => {
+    if (e.target.id === 'modal-admin') cerrarAdmin();
+  });
+
+  // ============ INIT ============
+  (async () => {
+    await abrirDB();
+    const promos = await leerConfig('promociones');
+    const vivs = await leerConfig('viviendas');
+    const favs = await leerConfig('favoritos');
+
+    if (promos) ESTADO.promociones = promos;
+    if (vivs) ESTADO.viviendas = vivs;
+    if (favs) ESTADO.favoritos = new Set(favs);
+
+    renderTodo();
+
+    // Si no hay datos al cargar, abrir admin automáticamente la primera vez
+    if (!promos || !promos.length) {
+      // No abrir automáticamente, mostrar empty state que ya tiene CTA
+    }
+  })();
+
+  // PWA: registrar service worker si está disponible
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+</script>
+
+</body>
+</html>
