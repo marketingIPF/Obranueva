@@ -1691,20 +1691,8 @@
   }
 
   // ============ EMAIL ============
-  async function enviarEmail() {
-    const email = document.getElementById('cliente-email').value.trim();
-    const nombre = document.getElementById('cliente-nombre').value.trim();
-    const emailInterno = await leerConfig('email_interno') || '';
-
-    if (!email) {
-      mostrarToast('Indica un email válido', 'error');
-      return;
-    }
-    if (!ESTADO.favoritos.size) {
-      mostrarToast('No hay favoritos seleccionados', 'error');
-      return;
-    }
-
+  // Construye el cuerpo del email a partir de los favoritos
+  function construirCuerpoEmail(nombre) {
     let cuerpo = `Hola${nombre ? ' ' + nombre : ''},\n\n`;
     cuerpo += `Gracias por tu visita a RK Palanca Fontestad. Te enviamos la información de las viviendas que has seleccionado como favoritas:\n\n`;
     cuerpo += `${'─'.repeat(50)}\n\n`;
@@ -1736,14 +1724,129 @@
     cuerpo += `Si quieres concertar una visita o resolver cualquier duda sobre estas viviendas, responde a este correo o contacta con nosotros directamente.\n\n`;
     cuerpo += `Un saludo,\nRK Palanca Fontestad\nValencia y área metropolitana\n`;
 
-    const asunto = `Tus viviendas favoritas — RK Palanca Fontestad`;
-    let mailto = `mailto:${encodeURIComponent(email)}`;
-    const params = [`subject=${encodeURIComponent(asunto)}`, `body=${encodeURIComponent(cuerpo)}`];
-    if (emailInterno) params.unshift(`cc=${encodeURIComponent(emailInterno)}`);
-    mailto += '?' + params.join('&');
+    return cuerpo;
+  }
 
-    window.location.href = mailto;
-    mostrarToast('Abriendo cliente de correo…', 'success');
+  // Copia texto al portapapeles con fallback para navegadores antiguos
+  async function copiarAlPortapapeles(texto) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(texto);
+        return true;
+      }
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = texto;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  // Construye un mailto con o sin cuerpo
+  function construirMailto(email, asunto, cuerpo, cc) {
+    let mailto = `mailto:${encodeURIComponent(email)}`;
+    const params = [];
+    if (cc) params.push(`cc=${encodeURIComponent(cc)}`);
+    if (asunto) params.push(`subject=${encodeURIComponent(asunto)}`);
+    if (cuerpo) params.push(`body=${encodeURIComponent(cuerpo)}`);
+    if (params.length) mailto += '?' + params.join('&');
+    return mailto;
+  }
+
+  // Abre mailto de la forma más compatible posible
+  function abrirMailto(url) {
+    // Crear un <a> y dispararlo simula mejor un clic real del usuario
+    // (más fiable que window.location en algunos navegadores)
+    const a = document.createElement('a');
+    a.href = url;
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  async function enviarEmail() {
+    const email = document.getElementById('cliente-email').value.trim();
+    const nombre = document.getElementById('cliente-nombre').value.trim();
+    const emailInterno = await leerConfig('email_interno') || '';
+
+    // Validación email mínima
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      mostrarToast('Indica un email válido', 'error');
+      return;
+    }
+    if (!ESTADO.favoritos.size) {
+      mostrarToast('No hay favoritos seleccionados', 'error');
+      return;
+    }
+
+    const asunto = `Tus viviendas favoritas — RK Palanca Fontestad`;
+    const cuerpo = construirCuerpoEmail(nombre);
+
+    // Construir mailto completo y comprobar longitud
+    const mailtoCompleto = construirMailto(email, asunto, cuerpo, emailInterno);
+    const LIMITE_MAILTO = 1900; // margen de seguridad bajo el límite de ~2000 de la mayoría de navegadores
+
+    if (mailtoCompleto.length <= LIMITE_MAILTO) {
+      // Caso normal: cabe todo en el mailto
+      abrirMailto(mailtoCompleto);
+      mostrarToast('Abriendo cliente de correo…', 'success');
+      return;
+    }
+
+    // Caso largo: copiar cuerpo al portapapeles + abrir mailto solo con asunto
+    const copiado = await copiarAlPortapapeles(cuerpo);
+    const mailtoCorto = construirMailto(email, asunto, '', emailInterno);
+
+    abrirMailto(mailtoCorto);
+
+    if (copiado) {
+      mostrarToast('Abriendo correo. Contenido copiado al portapapeles: pégalo en el cuerpo (Cmd/Ctrl+V).', 'success');
+    } else {
+      // Si tampoco se pudo copiar, mostrar el cuerpo en un modal para que lo copie a mano
+      mostrarModalCuerpo(cuerpo);
+    }
+  }
+
+  // Modal de fallback: muestra el cuerpo del email en un textarea
+  function mostrarModalCuerpo(cuerpo) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay active';
+    overlay.style.zIndex = '3000';
+    overlay.innerHTML = `
+      <div class="modal" style="max-width:640px; background:white;">
+        <div class="modal-header">
+          <h2 class="modal-title">Copia el contenido del email</h2>
+          <button class="icon-btn" id="cerrar-cuerpo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p style="margin-bottom:16px; color:var(--gris-5); font-size:14px;">
+            El contenido es muy largo para abrirse automáticamente en el correo. Copia el texto de abajo y pégalo en el cuerpo del email que se ha abierto.
+          </p>
+          <textarea id="cuerpo-textarea" style="width:100%; min-height:300px; padding:14px; border:1px solid var(--gris-3); border-radius:var(--radius-md); font-family:inherit; font-size:13px; line-height:1.5; resize:vertical;">${cuerpo.replace(/</g,'&lt;')}</textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary btn-orange" id="copiar-cuerpo">Copiar al portapapeles</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#cerrar-cuerpo').onclick = () => overlay.remove();
+    overlay.querySelector('#copiar-cuerpo').onclick = async () => {
+      const txt = overlay.querySelector('#cuerpo-textarea').value;
+      const ok = await copiarAlPortapapeles(txt);
+      mostrarToast(ok ? 'Copiado al portapapeles' : 'No se pudo copiar — selecciona el texto manualmente', ok ? 'success' : 'error');
+    };
   }
 
   // ============ ADMIN ============
